@@ -4,7 +4,24 @@
 #include <ctime>
 #include <cstdlib>
 
-struct SciezkaRobota {
+using namespace std;
+
+struct Plansza{
+	bool kolor; // false - kolor czarny, robot nie moze sie przemiescic, true - kolor bialy
+	Plansza* North;
+	Plansza* South;
+	Plansza* West;
+	Plansza* East;
+
+};
+
+void MenuGlowne()
+{
+
+}
+
+void InicjalizacjaListy()
+{
 
 };
 
