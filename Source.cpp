@@ -27,5 +27,5 @@ void InicjalizacjaListy()
 
 int main()
 {
-
+cout << "hello world";
 }
