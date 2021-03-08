@@ -6,12 +6,14 @@
 
 using namespace std;
 
-struct Plansza{
+#define BialePole char(219)
+#define CzarnePole char(255)
+#define Robocik char(167)
+
+struct Wierzcholek{
+	int Wartosc;
 	bool kolor; // false - kolor czarny, robot nie moze sie przemiescic, true - kolor bialy
-	Plansza* North;
-	Plansza* South;
-	Plansza* West;
-	Plansza* East;
+	Wierzcholek* North;
 
 };
 
@@ -27,7 +29,5 @@ void InicjalizacjaListy()
 
 int main()
 {
-
-cout << "hello world";
 
 }
