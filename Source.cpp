@@ -179,13 +179,183 @@ int main()
 	for (int i = 0; i < Wymiar40; i++)
 		for (int j = 0; j < Wymiar20; j++)
 		{
-			if (MacierzGrafu[i][j] == 0) continue;
-			if ((i = 0)
+		if (MacierzGrafu[i][j] == 0) continue;
+			if (i == 0)
 			{
-
+				if (j == 0)
+				{
+					if (MacierzGrafu[i + 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i + 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i][j + 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j + 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+				}
+				else if (j == 39)
+				{
+					if (MacierzGrafu[i][j - 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j - 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i + 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i + 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+				}
+					else
+				{
+					if (MacierzGrafu[i][j - 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j - 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i + 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i + 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i][j + 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j + 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+				}
+			}
+			else if (j == 0)
+			{
+				if (i == 39)
+				{
+					if (MacierzGrafu[i - 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i - 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i][j + 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j + 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+				}
+				else
+				{
+					if (MacierzGrafu[i - 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i - 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i + 1][j] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = (((i + 1) * Wymiar20) + j);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+					if (MacierzGrafu[i][j + 1] == 1)
+					{
+						p = new Wierzcholek;
+						p->wartosc = ((i * Wymiar20) + j + 1);
+						p->next = TablicaList[(i * Wymiar20) + j];
+						TablicaList[(i * Wymiar20) + j] = p;
+					}
+				}
+			}
+			else if (i == 39)
+			{
+			if (j == 39)
+				{
+				if (MacierzGrafu[i - 1][j] == 1)
+				{
+					p = new Wierzcholek;
+					p->wartosc = (((i - 1) * Wymiar20) + j);
+					p->next = TablicaList[(i * Wymiar20) + j];
+					TablicaList[(i * Wymiar20) + j] = p;
+				}
+				if (MacierzGrafu[i][j - 1] == 1)
+				{
+					p = new Wierzcholek;
+					p->wartosc = ((i * Wymiar20) + j - 1);
+					p->next = TablicaList[(i * Wymiar20) + j];
+					TablicaList[(i * Wymiar20) + j] = p;
+				}
+				}
+			else
+			{
+				if (MacierzGrafu[i - 1][j] == 1)
+				{
+					p = new Wierzcholek;
+					p->wartosc = (((i - 1) * Wymiar20) + j);
+					p->next = TablicaList[(i * Wymiar20) + j];
+					TablicaList[(i * Wymiar20) + j] = p;
+				}
+				if (MacierzGrafu[i][j - 1] == 1)
+				{
+					p = new Wierzcholek;
+					p->wartosc = ((i * Wymiar20) + j - 1);
+					p->next = TablicaList[(i * Wymiar20) + j];
+					TablicaList[(i * Wymiar20) + j] = p;
+				}
+				if (MacierzGrafu[i][j + 1] == 1)
+				{
+					p = new Wierzcholek;
+					p->wartosc = ((i * Wymiar20) + j + 1);
+					p->next = TablicaList[(i * Wymiar20) + j];
+					TablicaList[(i * Wymiar20) + j] = p;
+				}
+			}
+			}
+			else if (j == 39)
+			{
+			if (MacierzGrafu[i - 1][j] == 1)
+			{
+				p = new Wierzcholek;
+				p->wartosc = (((i - 1) * Wymiar20) + j);
+				p->next = TablicaList[(i * Wymiar20) + j];
+				TablicaList[(i * Wymiar20) + j] = p;
+			}
+			if (MacierzGrafu[i][j - 1] == 1)
+			{
+				p = new Wierzcholek;
+				p->wartosc = ((i * Wymiar20) + j - 1);
+				p->next = TablicaList[(i * Wymiar20) + j];
+				TablicaList[(i * Wymiar20) + j] = p;
+			}
+			if (MacierzGrafu[i + 1][j] == 1)
+			{
+				p = new Wierzcholek;
+				p->wartosc = (((i + 1) * Wymiar20) + j);
+				p->next = TablicaList[(i * Wymiar20) + j];
+				TablicaList[(i * Wymiar20) + j] = p;
+			}
 			}
 			else
 			{
+
 				if (MacierzGrafu[i - 1][j] == 1)
 				{
 					p = new Wierzcholek;
@@ -207,7 +377,7 @@ int main()
 					p->next = TablicaList[(i * Wymiar20) + j];
 					TablicaList[(i * Wymiar20) + j] = p;
 				}
-				if (MacierzGrafu[i - 1][j - 1] == 1)
+				if (MacierzGrafu[i][j + 1] == 1)
 				{
 					p = new Wierzcholek;
 					p->wartosc = ((i * Wymiar20) + j + 1);
