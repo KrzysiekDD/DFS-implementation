@@ -155,7 +155,7 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 					UwtorzSasiada(MacierzGrafu, TablicaList, dol, i, j);
 					UwtorzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
 				}
-				else if (j == 39)
+				else if (j == Wymiar40 - 1)
 				{
 					UwtorzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
 					UwtorzSasiada(MacierzGrafu, TablicaList, dol, i, j);
@@ -169,7 +169,7 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 			}
 			else if (j == 0)
 			{
-				if (i == 39)
+				if (i == Wymiar40 - 1)
 				{
 					UwtorzSasiada(MacierzGrafu, TablicaList, gora, i, j);
 					UwtorzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
@@ -181,9 +181,9 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 					UwtorzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
 				}
 			}
-			else if (i == 39)
+			else if (i == Wymiar40 - 1)
 			{
-				if (j == 39)
+				if (j == Wymiar40 - 1)
 				{
 					UwtorzSasiada(MacierzGrafu, TablicaList, gora, i, j);
 					UwtorzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
@@ -195,7 +195,7 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 					UwtorzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
 				}
 			}
-			else if (j == 39)
+			else if (j == Wymiar40 - 1)
 			{
 				UwtorzSasiada(MacierzGrafu, TablicaList, gora, i, j);
 				UwtorzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
@@ -278,7 +278,7 @@ int main()
 
 	StworzMacierzPlanszy(Macierz, MacierzGrafu);
 
-	for (int g = 0; g < 40; g++) 
+	for (int g = 0; g < Wymiar40; g++)
 	{
 		for (int z = 0; z < 20; z++)
 			if (MacierzGrafu[g][z])
