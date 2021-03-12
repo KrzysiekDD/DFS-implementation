@@ -193,7 +193,7 @@ int main()
 				{
 					p = new Wierzcholek;
 					p->wartosc = ((i * Wymiar20) + j - 1);
-					p->next = TablicaList[(i * Wymiar20) + j];
+					p->next = TablicaList[(i * Wymiar20) + j]->next;
 					TablicaList[(i * Wymiar20) + j] = p;
 				}/*
 				if (MacierzGrafu[i + 1][j] == 1)
