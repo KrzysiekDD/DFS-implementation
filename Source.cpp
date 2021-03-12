@@ -171,21 +171,25 @@ int main()
 
 
 
-	Wierzcholek** TablicaList = new Wierzcholek * [LiczbaWierzcholkow];
+	Wierzcholek** TablicaList = new Wierzcholek * [Wymiar40 * Wymiar20];
 
-	for (int i = 0; i < LiczbaWierzcholkow; i++)
+	for (int i = 0; i < Wymiar40*Wymiar20; i++)
 		TablicaList[i] = nullptr;
 
-	for (int i = 1; i < Wymiar40-1; i++)
-		for (int j = 1; j < Wymiar20-1; j++)
+	for (int i = 0; i < Wymiar40; i++)
+		for (int j = 0; j < Wymiar20; j++)
 		{
 			if (MacierzGrafu[i][j] == 0) continue;
-			else 
+			if ((i = 0)
+			{
+
+			}
+			else
 			{
 				if (MacierzGrafu[i - 1][j] == 1)
 				{
 					p = new Wierzcholek;
-					p->wartosc = (((i-1) * Wymiar20) + j);
+					p->wartosc = (((i - 1) * Wymiar20) + j);
 					p->next = TablicaList[(i * Wymiar20) + j];
 					TablicaList[(i * Wymiar20) + j] = p;
 				}
@@ -195,11 +199,11 @@ int main()
 					p->wartosc = ((i * Wymiar20) + j - 1);
 					p->next = TablicaList[(i * Wymiar20) + j];
 					TablicaList[(i * Wymiar20) + j] = p;
-				}/*
+				}
 				if (MacierzGrafu[i + 1][j] == 1)
 				{
 					p = new Wierzcholek;
-					p->wartosc = (((i+1) * Wymiar20) + j);
+					p->wartosc = (((i + 1) * Wymiar20) + j);
 					p->next = TablicaList[(i * Wymiar20) + j];
 					TablicaList[(i * Wymiar20) + j] = p;
 				}
@@ -210,33 +214,30 @@ int main()
 					p->next = TablicaList[(i * Wymiar20) + j];
 					TablicaList[(i * Wymiar20) + j] = p;
 				}
-				
-			*/	
+			
 			}
-			/*
-			cin >> v1 >> v2;
+			/*cin >> v1 >> v2;  // wierzcholek poczatkowy i koncowy 
 			p = new Wierzcholek;
 			p->wartosc = v2;
 			p->next = TablicaList[v1];
-			TablicaList[v1] = p;
-		*/
+			TablicaList[v1] = p;*/
 		}
 
 
-	for (int i = 0; i < LiczbaWierzcholkow; i++)
+	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
 	{
 		cout << "Lista [ " << i << " ] =";
 		p = TablicaList[i];
 		while (p)
 		{
-			cout << setw(3) << p->wartosc;
+			cout << setw(5) << p->wartosc;
 			p = p->next;
 		}
 		cout << endl;
 	}
 
 
-	for (int i = 0; i < LiczbaWierzcholkow; i++)
+	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
 	{
 		p = TablicaList[i];
 		while (p)
