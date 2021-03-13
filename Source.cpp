@@ -29,6 +29,7 @@ void DefinicjaSegmentu(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu
 void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int w, int k);
 void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column);
 void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited);
+void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy);
 
 void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4])
 {
@@ -283,7 +284,7 @@ void WypiszWierzcholki(Wierzcholek **& TablicaList)
 	}
 }
 
-void UsunGraf(Wierzcholek **& TablicaList,bool* visited)
+void UsunGraf(Wierzcholek **& TablicaList,bool*& visited)
 {
 	Wierzcholek* p, * r;
 	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
@@ -301,11 +302,8 @@ void UsunGraf(Wierzcholek **& TablicaList,bool* visited)
 	delete[] visited;
 }
 
-void DFS(Wierzcholek**& TablicaList, bool* visited, int startowy, int koncowy)
+void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy)
 {
-	if (startowy != koncowy)
-	{
-
 		Wierzcholek* p;
 
 		visited[startowy] = true;
@@ -317,12 +315,6 @@ void DFS(Wierzcholek**& TablicaList, bool* visited, int startowy, int koncowy)
 			if (!visited[p->numerwierzcholka])
 				DFS(TablicaList, visited, p->numerwierzcholka, koncowy);
 		}
-
-	}
-	else {
-		cout << "\n koncowy wierzcholek to: \n" << koncowy;
-		return;
-	}
 }
 
 
@@ -381,7 +373,7 @@ int main()
 
 	int KoncowyWierzcholek;
 	KoncowyWierzcholek = (R2 * Wymiar20) + C2;
-	cout << KoncowyWierzcholek << "\n";
+	cout << LosowyWierzcholek << setw(5) << KoncowyWierzcholek << "\n";
 
 	DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek);
 
