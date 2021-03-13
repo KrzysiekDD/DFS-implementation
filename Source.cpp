@@ -305,8 +305,6 @@ void UsunGraf(Wierzcholek **& TablicaList,bool*& visited,int*& SciezkaRobota)
 void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int*& SciezkaRobota, int MacierzGrafu[Wymiar40][Wymiar20],bool znaleziony)
 {
 		Wierzcholek* p;
-        int counter = 0;
-        counter++;
     if(!znaleziony && !visited[startowy])
         MacierzGrafu[startowy / 20][startowy % 20] = 2;
 
