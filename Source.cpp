@@ -369,13 +369,13 @@ int main()
 	do{
 		R1 = rand() % Wymiar40;
 		C1 = rand() % Wymiar20;
-	} while (MacierzGrafu[R1][C1] != 1);
-
+	} while (!TablicaList[(R1 * Wymiar20) + C1]);
+    //while (MacierzGrafu[R1][C1] != 1);
 	do{
 		R2 = rand() % Wymiar40;
 		C2 = rand() % Wymiar20;
-	} while ((MacierzGrafu[R2][C2] != 1) && (R2 != R1) && (C2 != C1));
-
+	} while (!TablicaList[(R2 * Wymiar20) + C2]);
+    //while ((MacierzGrafu[R2][C2] != 1) && (R2 != R1) && (C2 != C1));
 	int LosowyWierzcholek;
 	LosowyWierzcholek = (R1 * Wymiar20) + C1;
 
