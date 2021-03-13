@@ -29,7 +29,7 @@ void DefinicjaSegmentu(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu
 void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int w, int k);
 void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column);
 void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited);
-void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy);
+void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int*& SciezkaRobota, int MacierzGrafu[Wymiar40][Wymiar20], bool znaleziony);
 
 void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4])
 {
@@ -136,7 +136,6 @@ void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int 
 	}
 	}
 }
-
 
 void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& TablicaList,bool*& visited)
 {
@@ -284,7 +283,7 @@ void WypiszWierzcholki(Wierzcholek **& TablicaList)
 	}
 }
 
-void UsunGraf(Wierzcholek **& TablicaList,bool*& visited)
+void UsunGraf(Wierzcholek **& TablicaList,bool*& visited,int*& SciezkaRobota)
 {
 	Wierzcholek* p, * r;
 	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
@@ -300,22 +299,25 @@ void UsunGraf(Wierzcholek **& TablicaList,bool*& visited)
 
 	delete[] TablicaList;
 	delete[] visited;
+	delete[] SciezkaRobota;
 }
 
-void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy)
+void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int*& SciezkaRobota, int MacierzGrafu[Wymiar40][Wymiar20],bool znaleziony)
 {
 		Wierzcholek* p;
-
 		visited[startowy] = true;
-
-		cout << setw(5) << startowy;
+		if(!znaleziony)
+			MacierzGrafu[startowy / 20][startowy % 20] = 2;
+		if (startowy == koncowy)
+			cout << "tu powinien byc koniec";
+		cout << setw(3) << startowy << "->";
 
 		for (p = TablicaList[startowy]; p; p = p->next)
 		{
 			if (!visited[p->numerwierzcholka])
-				DFS(TablicaList, visited, p->numerwierzcholka, koncowy);
+				DFS(TablicaList, visited, p->numerwierzcholka, koncowy, SciezkaRobota, MacierzGrafu,znaleziony);
 		}
-}
+	}
 
 
 int main()
@@ -323,7 +325,9 @@ int main()
 	Wierzcholek* p;
 	Wierzcholek* r;
 	bool* visited;
-	int v1, v2, n, R1, C1, R2, C2;
+	bool znaleziony = true;
+	int* SciezkaRobota = new int[Wymiar40 * Wymiar20];
+	int R1, C1, R2, C2;
 
 	char Macierz[Wymiar8][Wymiar4];
 	int MacierzGrafu[Wymiar40][Wymiar20];
@@ -375,13 +379,25 @@ int main()
 	KoncowyWierzcholek = (R2 * Wymiar20) + C2;
 	cout << LosowyWierzcholek << setw(5) << KoncowyWierzcholek << "\n";
 
-	DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek);
+	DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek,SciezkaRobota,MacierzGrafu,znaleziony);
 
 
+	cout << "\n\n";
+	for (int g = 0; g < Wymiar40; g++)
+	{
+		for (int z = 0; z < Wymiar20; z++) {
+			if (MacierzGrafu[g][z] == 1)
+				cout << BialePole;
+			else if (MacierzGrafu[g][z] == 2)
+				cout << "+";
+			else cout << CzarnePole;
+		}
+			cout << "\n";
+		
+		}
 
 
-
-	UsunGraf(TablicaList, visited);
+	UsunGraf(TablicaList, visited,SciezkaRobota);
 
 	return 0;
 }
