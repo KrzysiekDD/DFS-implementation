@@ -312,8 +312,8 @@ void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, 
 
 		if (startowy == koncowy) {
             cout << "tu powinien byc koniec";
-            znaleziony = true;
-		}
+            znaleziony = true; //TO NIE JEST GLOBALNEDSNGJKFNGKJFDN KONCZY SIE EFEKT TEGO JAK WROCI NIE WIEM
+		}                       // A NO I Z JAKIEGOŚ POWODU DFS POTRAFI PRZEJŚĆ
 		cout << setw(3) << startowy << "->";
 
 		for (p = TablicaList[startowy]; p; p = p->next)
@@ -388,24 +388,49 @@ int main()
 	cout << "\n\n";
 	for (int g = 0; g < Wymiar40; g++)
 	{
+
 		for (int z = 0; z < Wymiar20; z++) {
 		    if (g == R1 && z == C1) {
-		        cout << "R";
+		        cout << setw(2) << "R" << (g*Wymiar20)+z;
 		    } else if (g == R2 && z == C2) {
-		        cout << "C";
+		        cout << setw(2) << "C" << (g*Wymiar20)+z;
 		    } else if (MacierzGrafu[g][z] == 1){
-                cout << BialePole;
+                cout << setw(2) << BialePole << (g*Wymiar20)+z;
 			} else if (MacierzGrafu[g][z] == 2) {
-                cout << "+";
+                cout << setw(2) << "+" << (g*Wymiar20)+z;
 			} else {
-			    cout << CzarnePole;
+			    cout << setw(2) << CzarnePole << (g*Wymiar20)+z;
 			}
 
-			//cout << MacierzGrafu[g][z];
+			//cout << setw(5) << (g*Wymiar20)+z;
 		}
 			cout << "\n";
 		
 		}
+
+	    cout << endl << endl << endl;
+
+    for (int g = 0; g < Wymiar40; g++)
+    {
+
+        for (int z = 0; z < Wymiar20; z++) {
+            if (g == R1 && z == C1) {
+                cout << "R";
+            } else if (g == R2 && z == C2) {
+                cout << "C";
+            } else if (MacierzGrafu[g][z] == 1){
+                cout << BialePole;
+            } else if (MacierzGrafu[g][z] == 2) {
+                cout << "+";
+            } else {
+                cout << CzarnePole;
+            }
+
+            //cout << setw(5) << (g*Wymiar20)+z;
+        }
+        cout << "\n";
+
+    }
 
 
 	UsunGraf(TablicaList, visited,SciezkaRobota);
