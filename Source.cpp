@@ -14,12 +14,12 @@ const int Wymiar20 = 20;
 #define BialePole char(219)
 #define CzarnePole char(255)
 #define Robocik char(167)
-
+#define CLS system("cls");
+#define PAUSE system("pause");
 
 struct Wierzcholek {
 	Wierzcholek* next;
 	int numerwierzcholka;
-	bool kolor; // false - kolor czarny, robot nie moze sie przemiescic, true - kolor bialy
 };
 
 void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4]);
@@ -29,7 +29,24 @@ void DefinicjaSegmentu(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu
 void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int w, int k);
 void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column);
 void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited);
-void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int*& SciezkaRobota, int MacierzGrafu[Wymiar40][Wymiar20], bool znaleziony);
+bool DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int MacierzGrafu[Wymiar40][Wymiar20]);
+void PiszMenu(int Numer);
+void MenuGlowne();
+void DrogaRobota();
+void OprawaGraficzna(int n);
+
+void OprawaGraficzna(int n)
+{
+	switch (n)
+	{
+	case 1: cout << "*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*\n";
+		break;
+	case 2: cout << " _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n";
+		break;
+	case 3: cout << "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n";
+		break;
+	}
+}
 
 void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4])
 {
@@ -137,7 +154,7 @@ void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int 
 	}
 }
 
-void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& TablicaList,bool*& visited)
+void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited)
 {
 	TablicaList = new Wierzcholek * [Wymiar40 * Wymiar20];
 	visited = new bool[Wymiar40 * Wymiar20];
@@ -145,7 +162,7 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 	char dol = 'D', gora = 'G', lewo = 'L', prawo = 'P';
 	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
 	{
-		TablicaList[i] = nullptr;
+		TablicaList[i] = NULL;
 		visited[i] = false;
 	}
 
@@ -222,13 +239,13 @@ void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Ta
 		}
 };
 
-void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& TablicaList,const char Kierunek, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
+void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
 {
 	Wierzcholek* p;
 	int variable = int(Kierunek) - 67;
 	switch (variable)
 	{
-	case 1: {
+	case 1: 
 		if (MacierzGrafu[row + 1][column] == 1)
 		{
 			p = new Wierzcholek;
@@ -236,8 +253,8 @@ void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Tablica
 			p->next = TablicaList[(row * Wymiar20) + column];
 			TablicaList[(row * Wymiar20) + column] = p;
 		}
-	}break;
-	case 4: {
+	break;
+	case 4: 
 		if (MacierzGrafu[row - 1][column] == 1)
 		{
 			p = new Wierzcholek;
@@ -245,8 +262,8 @@ void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Tablica
 			p->next = TablicaList[(row * Wymiar20) + column];
 			TablicaList[(row * Wymiar20) + column] = p;
 		}
-	}break;
-	case 9: {
+	break;
+	case 9: 
 		if (MacierzGrafu[row][column - 1] == 1)
 		{
 			p = new Wierzcholek;
@@ -254,8 +271,8 @@ void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Tablica
 			p->next = TablicaList[(row * Wymiar20) + column];
 			TablicaList[(row * Wymiar20) + column] = p;
 		}
-	}break;
-	case 13: {
+	break;
+	case 13:
 		if (MacierzGrafu[row][column + 1] == 1)
 		{
 			p = new Wierzcholek;
@@ -263,11 +280,11 @@ void UwtorzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek **& Tablica
 			p->next = TablicaList[(row * Wymiar20) + column];
 			TablicaList[(row * Wymiar20) + column] = p;
 		}
-	}break;
+	break;
 	}
 }
 
-void WypiszWierzcholki(Wierzcholek **& TablicaList)
+void WypiszWierzcholki(Wierzcholek**& TablicaList)
 {
 	Wierzcholek* p;
 	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
@@ -283,7 +300,7 @@ void WypiszWierzcholki(Wierzcholek **& TablicaList)
 	}
 }
 
-void UsunGraf(Wierzcholek **& TablicaList,bool*& visited,int*& SciezkaRobota)
+void UsunGraf(Wierzcholek**& TablicaList, bool*& visited)
 {
 	Wierzcholek* p, * r;
 	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
@@ -299,34 +316,85 @@ void UsunGraf(Wierzcholek **& TablicaList,bool*& visited,int*& SciezkaRobota)
 
 	delete[] TablicaList;
 	delete[] visited;
-	delete[] SciezkaRobota;
 }
 
-void DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int*& SciezkaRobota, int MacierzGrafu[Wymiar40][Wymiar20],bool znaleziony)
-{
-		Wierzcholek* p;
-		visited[startowy] = true;
-		if(!znaleziony)
-			MacierzGrafu[startowy / 20][startowy % 20] = 2;
-		if (startowy == koncowy)
-			cout << "tu powinien byc koniec";
-		cout << setw(3) << startowy << "->";
+bool DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int MacierzGrafu[Wymiar40][Wymiar20])
 
-		for (p = TablicaList[startowy]; p; p = p->next)
-		{
-			if (!visited[p->numerwierzcholka])
-				DFS(TablicaList, visited, p->numerwierzcholka, koncowy, SciezkaRobota, MacierzGrafu,znaleziony);
-		}
-	}
-
-
-int main()
 {
 	Wierzcholek* p;
-	Wierzcholek* r;
+	visited[startowy] = true;
+
+	cout << setw(3) << startowy << "->";
+
+		if (startowy == koncowy)
+		{
+			cout << koncowy << setw(5) << "funkcja znalazla droge";
+		return true;
+		}
+	for (p = TablicaList[startowy]; p; p = p->next)
+	{
+		MacierzGrafu[startowy / 20][startowy % 20] = 2;
+		if (!visited[p->numerwierzcholka] && DFS(TablicaList, visited, p->numerwierzcholka, koncowy, MacierzGrafu));
+		return true;
+	}
+	return false;
+}
+
+void MenuGlowne()
+{
+	int wybor;
+	do
+	{
+		PiszMenu(1);
+		cin >> wybor;
+		switch (wybor)
+		{
+		case 1: DrogaRobota();
+			break;
+		case 2:PiszMenu(2);
+			break;
+		case 3:exit(0);
+			break;
+		}
+	} while (wybor != 3);
+	
+
+}
+
+void PiszMenu(int Numer)
+{
+	switch (Numer)
+	{
+	case 1:
+		CLS
+		OprawaGraficzna(1);
+		cout << setw(77) << "Wyznaczanie drogi robota przy uzyciu algorytmu typu Depth-First-Search\n"
+			<< setw(60) << " By Damian Kakol and Krzysztof Dymanowski\n\n"
+			<< "  Prosze wpisac numer opcji ktora chce sie wybrac i wcisnac enter:\n"
+			<< "  1. Prezentacja Algorytmu.\n"
+			<< "  2. Krotkie objasnienie dzialania programu.\n"
+			<< "  3. Wyjscie z programu.\n";
+		OprawaGraficzna(2);
+		OprawaGraficzna(3);
+		break;
+	case 2:
+		CLS
+		OprawaGraficzna(1);
+		cout <<  "Graf, ktory tworzony jest na podstawie dwuwymiarowej tablicy i zapisany jako\n"
+			<<  "  dynamiczna lista sasiedztw wierzcholkow, przy pomocy rekurencyjnego wywolania funkcji\n"
+			<<  "  DFS, znaduje droge pomiedzy dwoma punktami na planszy o wymiarach 40 x 20\n"
+			<<  "  od punktu A do punktu B\n";
+		OprawaGraficzna(2);
+		OprawaGraficzna(3);
+		PAUSE
+		break;
+	}
+}
+
+void DrogaRobota()
+{
+	CLS
 	bool* visited;
-	bool znaleziony = true;
-	int* SciezkaRobota = new int[Wymiar40 * Wymiar20];
 	int R1, C1, R2, C2;
 
 	char Macierz[Wymiar8][Wymiar4];
@@ -338,66 +406,69 @@ int main()
 	WypiszMacierz(Macierz);
 
 	StworzMacierzPlanszy(Macierz, MacierzGrafu);
-
-	for (int g = 0; g < Wymiar40; g++)
-	{
-		for (int z = 0; z < Wymiar20; z++)
-			if (MacierzGrafu[g][z])
-				cout << BialePole;
-			else cout << CzarnePole;
-		cout << "\n";
-	}
 	Wierzcholek** TablicaList;
 
 	InicjalizacjaListy(MacierzGrafu, TablicaList, visited);
-	/*
-	*	{
-			cin >> v1 >> v2;  // wierzcholek poczatkowy i koncowy 
-			p = new Wierzcholek;
-			p->wartosc = v2;
-			p->next = TablicaList[v1];
-			TablicaList[v1] = p;
-		}
-*/
-	WypiszWierzcholki(TablicaList);
-
-
-	do{
+	do {
 		R1 = rand() % Wymiar40;
 		C1 = rand() % Wymiar20;
-	} while (MacierzGrafu[R1][C1] != 1);
+	} while (!MacierzGrafu[R1][C1]);
 
-	do{
+	do {
 		R2 = rand() % Wymiar40;
 		C2 = rand() % Wymiar20;
-	} while ((MacierzGrafu[R2][C2] != 1) && (R2 != R1) && (C2 != C1));
+	} while (!MacierzGrafu[R2][C2] && (R2 != R1) && (C2 != C1));
 
-	int LosowyWierzcholek;
-	LosowyWierzcholek = (R1 * Wymiar20) + C1;
+	int LosowyWierzcholek = (R1 * Wymiar20) + C1;
 
-	int KoncowyWierzcholek;
-	KoncowyWierzcholek = (R2 * Wymiar20) + C2;
+	int KoncowyWierzcholek = (R2 * Wymiar20) + C2;
 	cout << LosowyWierzcholek << setw(5) << KoncowyWierzcholek << "\n";
 
-	DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek,SciezkaRobota,MacierzGrafu,znaleziony);
+	bool result = DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek, MacierzGrafu);
+	cout << "result: " << result;
+	/*
+*	{
+		cin >> v1 >> v2;  // wierzcholek poczatkowy i koncowy
+		p = new Wierzcholek;
+		p->wartosc = v2;
+		p->next = TablicaList[v1];
+		TablicaList[v1] = p;
+	}
+*/
+	cout << endl << endl << endl;
 
-
-	cout << "\n\n";
 	for (int g = 0; g < Wymiar40; g++)
 	{
+
 		for (int z = 0; z < Wymiar20; z++) {
-			if (MacierzGrafu[g][z] == 1)
+			if (g == R1 && z == C1) {
+				cout << "A";
+			}
+			else if (g == R2 && z == C2) {
+				cout << "R";
+			}
+			else if (MacierzGrafu[g][z] == 1) {
 				cout << BialePole;
-			else if (MacierzGrafu[g][z] == 2)
+			}
+			else if (MacierzGrafu[g][z] == 2) {
 				cout << "+";
-			else cout << CzarnePole;
+			}
+			else {
+				cout << CzarnePole;
+			}
+
+			//cout << setw(5) << (g*Wymiar20)+z;
 		}
-			cout << "\n";
-		
-		}
+		cout << "\n";
 
+	}
 
-	UsunGraf(TablicaList, visited,SciezkaRobota);
+	UsunGraf(TablicaList, visited);
+	PAUSE
+}
 
+int main()
+{
+	MenuGlowne();
 	return 0;
 }
