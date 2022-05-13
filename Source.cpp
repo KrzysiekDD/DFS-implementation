@@ -29,14 +29,14 @@ void graphics(int n);
 void show_nodes(GraphNode**& current_graph);
 void show_graph(int graph_matrix[INT_40][INT_20]);
 void show_segments(char segment_matrix[INT_8][INT_4]);
-void show_path(int order[INT_40 * INT_20], int koncowy);
+void show_path(int order[INT_40 * INT_20], int final_node);
 void generate_segments(char segment_matrix[INT_8][INT_4]);
 void segment_values(int graph_matrix[INT_40][INT_20], int Segment, int w, int k);
 void generate_graph(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20]);
 void graph_init(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, bool*& visited);
-void segment_definition(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k);
-bool DFS(GraphNode**& current_graph, bool*& visited, int startowy, int koncowy, int graph_matrix[INT_40][INT_20]);
-void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char Kierunek, int row, int column);
+void segment_definitions(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k);
+bool DFS(GraphNode**& current_graph, bool*& visited, int initial_node, int final_node, int graph_matrix[INT_40][INT_20], int next_visited);
+void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char direction, int row, int column);
 
 /*
 graphic design of the program
@@ -84,35 +84,35 @@ void generate_graph(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][
 	for (int w = 0; w < INT_8; w++)
 		for (int k = 0; k < INT_4; k++)
 		{
-			segment_values(segment_matrix, graph_matrix, w, k);
+			segment_definitions(segment_matrix, graph_matrix, w, k);
 		}
 }
 /*
 auxiliary function to fill the graph
 */
-void segment_values(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k)
+void segment_definitions(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k)
 {
 	int var = int((segment_matrix[w][k]) - 64);
 	switch (var)
 	{
-	case 1: segment_definition(graph_matrix, 1, w, k);
+	case 1: segment_values(graph_matrix, 1, w, k);
 		break;
-	case 2: segment_definition(graph_matrix, 2, w, k);
+	case 2: segment_values(graph_matrix, 2, w, k);
 		break;
-	case 3: segment_definition(graph_matrix, 3, w, k);
+	case 3: segment_values(graph_matrix, 3, w, k);
 		break;
-	case 4: segment_definition(graph_matrix, 4, w, k);
+	case 4: segment_values(graph_matrix, 4, w, k);
 		break;
-	case 5: segment_definition(graph_matrix, 5, w, k);
+	case 5: segment_values(graph_matrix, 5, w, k);
 		break;
-	case 6: segment_definition(graph_matrix, 6, w, k);
+	case 6: segment_values(graph_matrix, 6, w, k);
 		break;
 	}
 }
 /*
 each segment consists of either black or white nodes, black nodes being not accesible by the algorithm
 */
-void segment_definition(int graph_matrix[INT_40][INT_20], int Segment, int w, int k)
+void segment_values(int graph_matrix[INT_40][INT_20], int Segment, int w, int k)
 {
 	int r = w;
 	int c = k;
@@ -176,7 +176,7 @@ void graph_init(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, bo
 	current_graph = new GraphNode * [INT_40 * INT_20];
 	visited = new bool[INT_40 * INT_20];
 	GraphNode* p;
-	char dol = 'D', gora = 'G', lewo = 'L', prawo = 'P';
+	char down = 'D', up = 'G', left = 'L', right = 'P';
 	for (int i = 0; i < INT_40 * INT_20; i++)
 	{
 		current_graph[i] = NULL;
@@ -191,70 +191,70 @@ void graph_init(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, bo
 			{
 				if (j == 0)
 				{
-					create_neighbor(graph_matrix, current_graph, prawo, i, j);
-					create_neighbor(graph_matrix, current_graph, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, right, i, j);
+					create_neighbor(graph_matrix, current_graph, down, i, j);
 				}
 				else if (j == INT_20 - 1)
 				{
-					create_neighbor(graph_matrix, current_graph, lewo, i, j);
-					create_neighbor(graph_matrix, current_graph, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, left, i, j);
+					create_neighbor(graph_matrix, current_graph, down, i, j);
 				}
 				else
 				{
-					create_neighbor(graph_matrix, current_graph, lewo, i, j);
-					create_neighbor(graph_matrix, current_graph, prawo, i, j);
-					create_neighbor(graph_matrix, current_graph, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, left, i, j);
+					create_neighbor(graph_matrix, current_graph, right, i, j);
+					create_neighbor(graph_matrix, current_graph, down, i, j);
 				}
 			}
 			else if (j == 0)
 			{
 				if (i == INT_40 - 1)
 				{
-					create_neighbor(graph_matrix, current_graph, gora, i, j);
-					create_neighbor(graph_matrix, current_graph, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, up, i, j);
+					create_neighbor(graph_matrix, current_graph, right, i, j);
 				}
 				else
 				{
-					create_neighbor(graph_matrix, current_graph, gora, i, j);
-					create_neighbor(graph_matrix, current_graph, prawo, i, j);
-					create_neighbor(graph_matrix, current_graph, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, up, i, j);
+					create_neighbor(graph_matrix, current_graph, right, i, j);
+					create_neighbor(graph_matrix, current_graph, down, i, j);
 				}
 			}
 			else if (i == INT_40 - 1)
 			{
 				if (j == INT_20 - 1)
 				{
-					create_neighbor(graph_matrix, current_graph, gora, i, j);
-					create_neighbor(graph_matrix, current_graph, lewo, i, j);
+					create_neighbor(graph_matrix, current_graph, up, i, j);
+					create_neighbor(graph_matrix, current_graph, left, i, j);
 				}
 				else
 				{
-					create_neighbor(graph_matrix, current_graph, gora, i, j);
-					create_neighbor(graph_matrix, current_graph, lewo, i, j);
-					create_neighbor(graph_matrix, current_graph, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, up, i, j);
+					create_neighbor(graph_matrix, current_graph, left, i, j);
+					create_neighbor(graph_matrix, current_graph, right, i, j);
 				}
 			}
 			else if (j == INT_20 - 1)
 			{
-				create_neighbor(graph_matrix, current_graph, gora, i, j);
-				create_neighbor(graph_matrix, current_graph, lewo, i, j);
-				create_neighbor(graph_matrix, current_graph, dol, i, j);
+				create_neighbor(graph_matrix, current_graph, up, i, j);
+				create_neighbor(graph_matrix, current_graph, left, i, j);
+				create_neighbor(graph_matrix, current_graph, down, i, j);
 			}
 			else
 			{
-				create_neighbor(graph_matrix, current_graph, gora, i, j);
-				create_neighbor(graph_matrix, current_graph, lewo, i, j);
-				create_neighbor(graph_matrix, current_graph, prawo, i, j);
-				create_neighbor(graph_matrix, current_graph, dol, i, j);
+				create_neighbor(graph_matrix, current_graph, up, i, j);
+				create_neighbor(graph_matrix, current_graph, left, i, j);
+				create_neighbor(graph_matrix, current_graph, right, i, j);
+				create_neighbor(graph_matrix, current_graph, down, i, j);
 
 			}
 		}
 };
 
-void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char Kierunek, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
+void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char direction, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
 {
 	GraphNode* p;
-	int variable = (int(Kierunek) - 67);
+	int variable = (int(direction) - 67);
 	switch (variable)
 	{
 	case 1:
@@ -303,7 +303,7 @@ void show_nodes(GraphNode**& current_graph)
 	GraphNode* p;
 	for (int i = 0; i < INT_40 * INT_20; i++)
 	{
-		cout << "Lista [ " << i << " ] =";
+		cout << "List [ " << i << " ] =";
 		p = current_graph[i];
 		while (p)
 		{
@@ -316,7 +316,7 @@ void show_nodes(GraphNode**& current_graph)
 /*
 Deletes the graph, as it is dynamically created and new graph is generated with each presentation of the algorithm
 */
-void UsunGraf(GraphNode**& current_graph, bool*& visited)
+void delete_graph(GraphNode**& current_graph, bool*& visited)
 {
 	GraphNode* p, * r;
 	for (int i = 0; i < INT_40 * INT_20; i++)
@@ -336,26 +336,31 @@ void UsunGraf(GraphNode**& current_graph, bool*& visited)
 /*
 The Depth First Search recursive function, calls itself until it has found the target node
 */
-bool DFS(GraphNode**& current_graph, bool*& visited, int startowy, int koncowy, int graph_matrix[INT_40][INT_20], int order[INT_40 * INT_20], int kolejny)
-
+bool DFS(GraphNode**& current_graph,
+ 		 bool*& visited,
+  		 int initial_node,
+   		 int final_node,
+    	 int graph_matrix[INT_40][INT_20],
+	 	 int order[INT_40 * INT_20],
+	  	 int next_visited)
 {
 	GraphNode* p;
-	visited[startowy] = true;
-	if (startowy != koncowy) {
-		order[kolejny] = startowy;
-		kolejny++;
+	visited[initial_node] = true;
+	if (initial_node != final_node) {
+		order[next_visited] = initial_node;
+		next_visited++;
 	}
 
-	if (startowy == koncowy)
+	if (initial_node == final_node)
 	{
-		order[kolejny] = startowy;
-		cout << "Funkcja znalazla droge.\n";
+		order[next_visited] = initial_node;
+		cout << "The algorithm has found the path.\n";
 		return true;
 	}
-	for (p = current_graph[startowy]; p; p = p->next)
+	for (p = current_graph[initial_node]; p; p = p->next)
 	{
-		graph_matrix[startowy / 20][startowy % 20] = 2;
-		if (!visited[p->node_number] && DFS(current_graph, visited, p->node_number, koncowy, graph_matrix, order, kolejny))
+		graph_matrix[initial_node / 20][initial_node % 20] = 2;
+		if (!visited[p->node_number] && DFS(current_graph, visited, p->node_number, final_node, graph_matrix, order, next_visited))
 			return true;
 	}
 	return false;
@@ -365,12 +370,12 @@ this function contains the main program loop
 */
 void main_menu()
 {
-	int wybor;
+	int choice;
 	do
 	{
 		display_menu(1);
-		cin >> wybor;
-		switch (wybor)
+		cin >> choice;
+		switch (choice)
 		{
 		case 1: robots_path();
 			break;
@@ -379,7 +384,7 @@ void main_menu()
 		case 3:exit(0);
 			break;
 		}
-	} while (wybor != 3);
+	} while (choice != 3);
 
 
 }
@@ -393,51 +398,50 @@ void display_menu(int number)
 	case 1:
 		CLS;
 			graphics(1);
-		cout << setw(77) << "Wyznaczanie drogi robota przy uzyciu algorytmu typu Depth-First-Search\n"
-			<< setw(60) << " By Damian Kakol and Krzysztof Dymanowski\n\n"
-			<< "  Prosze wpisac number opcji ktora chce sie wybrac i wcisnac enter:\n"
-			<< "  1. Prezentacja Algorytmu.\n"
-			<< "  2. Krotkie objasnienie dzialania programu.\n"
-			<< "  3. Wyjscie z programu.\n";
+		cout << setw(60) << "Path finding with Depth-First-Search\n"
+			<< setw(55) << " By Krzysztof Dymanowski\n\n"
+			<< "  Please input the choice you would like to make:\n"
+			<< "  1. Algorithm presentation.\n"
+			<< "  2. Short instructions.\n"
+			<< "  3. Exit.\n";
 		graphics(2);
 		graphics(3);
 		break;
 	case 2:
 		CLS;
 			graphics(1);
-		cout << "  Graf, ktory tworzony jest na podstawie dwuwymiarowej tablicy i zapisany jako\n"
-			<< "  dynamiczna lista sasiedztw wierzcholkow, przy pomocy rekurencyjnego wywolania funkcji\n"
-			<< "  DFS, znajduje droge pomiedzy dwoma punktami na planszy o wymiarach 40 x 20\n"
-			<< "  od punktu A do punktu B, poruszajac sie jedynie po polach bialych\n";
+		cout << "  The graph is created from 40 x 20 matrix and is stored as a dynamically created\n"
+			<< "  linked list of neighbors. The recursive call to the DFS method\n"
+			<< "  finds the path from A to B, while only entering the white tiles\n";
 		graphics(2);
 		graphics(3);
 		PAUSE;
 			break;
 	case 3:
 		graphics(1);
-		cout << "Wybierz opcje wciskajac odpowiedni number i klikajac enter\n"
-			<< "  1. Wyswietl Tablice segmentow\n"
-			<< "  2. Wyswietl Plansze przed wyznaczeniem drogi\n"
-			<< "  3. Wyswietl Liste sasiedztw wierzcholkow\n"
-			<< "  4. Wyswietl Plansze po wyznaczeniu drogi\n"
-			<< "  5. Wyswietl order odwiedzania wierzcholkow\n"
-			<< "  6. Wyswietl number poczatkowego i koncowego wierzcholka\n"
-			<< "  7. Wyczysc ekran\n"
-			<< "  8. Wroc do menu glownego\n";
+		cout << "Input your choice and click enter:\n"
+			<< "  1. Show the matrix of segments\n"
+			<< "  2. Show the board before DFS\n"
+			<< "  3. Print neighbors of each node\n"
+			<< "  4. Show the board after DFS\n"
+			<< "  5. Print the order in which the nodes were visited\n"
+			<< "  6. Show the number of the first and last node\n"
+			<< "  7. Clean the screen\n"
+			<< "  8. Back to main menu\n";
 		break;
 	}
 }
 /*
 lists every node visited in chronological order
 */
-void show_path(int order[INT_40 * INT_20],int koncowy)
+void show_path(int order[INT_40 * INT_20],int final_node)
 {
 	int i;
 	for (i = 0; i < INT_40 * INT_20; i++) {
 		if (order[i] == 800) continue;
 		cout << order[i] << "->" << setw(6);
 	}
-	cout << " Ostatni (odwiedzony) GraphNode ma number: " << koncowy << "\n";
+	cout << " The last visited node was: " << final_node << "\n";
 }
 /*
 displays the 40 x 20 board that represents the graph, either before or after the DFS algorithm has been called
@@ -470,23 +474,23 @@ void robots_path()
 {
 	int order[INT_40 * INT_20];
 	int start = 0;
-	int kolejny = start;
+	int next_visited = 0;
 	srand(time(NULL));
 	CLS;
 	bool* visited;
 	int R1, C1, R2, C2;
-	int opcja;
-	char Macierz[INT_8][INT_4];
+	int option;
+	char matrix[INT_8][INT_4];
 	int graph_matrix[INT_40][INT_20];
-	int MacierzPoWyznaczeniuDrogi[INT_40][INT_20];
+	int matrix_after_dfs[INT_40][INT_20];
 	GraphNode** current_graph;
 	for (int i = 0; i < INT_40 * INT_20; i++)
 		order[i] = 800;
 
-	generate_segments(Macierz);
+	generate_segments(matrix);
 
-	generate_graph(Macierz, graph_matrix);
-	generate_graph(Macierz, MacierzPoWyznaczeniuDrogi);
+	generate_graph(matrix, graph_matrix);
+	generate_graph(matrix, matrix_after_dfs);
 
 	graph_init(graph_matrix, current_graph, visited);
 
@@ -505,22 +509,22 @@ void robots_path()
 	int current_target = (R2 * INT_20) + C2;
 	cout << random_node << setw(5) << current_target << "\n";
 
-	bool result = DFS(current_graph, visited, random_node, current_target, MacierzPoWyznaczeniuDrogi, order, kolejny);
+	bool result = DFS(current_graph, visited, random_node, current_target, matrix_after_dfs, order, next_visited);
 
 	graph_matrix[R1][C1] = 5;
 	graph_matrix[R2][C2] = 4;
-	MacierzPoWyznaczeniuDrogi[R1][C1] = 3;
-	MacierzPoWyznaczeniuDrogi[R2][C2] = 5;
+	matrix_after_dfs[R1][C1] = 3;
+	matrix_after_dfs[R2][C2] = 5;
 
 	CLS;
 
 		display_menu(3);
 
 	do {
-		cin >> opcja;
-		switch (opcja)
+		cin >> option;
+		switch (option)
 		{
-		case 1: show_segments(Macierz);
+		case 1: show_segments(matrix);
 			PAUSE;
 				break;
 		case 2:show_graph(graph_matrix);
@@ -529,13 +533,13 @@ void robots_path()
 		case 3:show_nodes(current_graph);
 			PAUSE;
 				break;
-		case 4:show_graph(MacierzPoWyznaczeniuDrogi);
+		case 4:show_graph(matrix_after_dfs);
 			PAUSE;
 				break;
 		case 5:show_path(order,current_target);
 			PAUSE;
 				break;
-		case 6: cout << " GraphNode poczatkowy ma number: " << random_node << " , a koncowy ma number: " << current_target << "\n";
+		case 6: cout << " The start node is: " << random_node << " , and the final node is: " << current_target << "\n";
 			PAUSE;
 				break;
 		case 7: CLS;
@@ -544,9 +548,9 @@ void robots_path()
 		case 8:
 			break;
 		}
-	} while (opcja != 8);
+	} while (option != 8);
 
-	UsunGraf(current_graph, visited);
+	delete_graph(current_graph, visited);
 	PAUSE;
 }
 
