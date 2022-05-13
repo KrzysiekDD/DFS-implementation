@@ -4,7 +4,7 @@ My implementation of the Depth First Search algorithm. The robot finds the path 
 
 Possible segments:
 
-[!Image alt](picture_examples/segments.png)
+[!Image alt](/picture_examples/segments.png)
 
 Example board before and after the path has been found:
 
