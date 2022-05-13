@@ -1,4 +1,3 @@
-// Damian Kakol 184890 i Krzysztof Dymanowski 184836 ACiR 3 IDE: Microsoft Visual Studio / JetBrains Clion 
 #include <iostream>
 #include <iomanip>
 #include <ctime>
@@ -6,46 +5,43 @@
 
 using namespace std;
 
-const int Wymiar8 = 8;
-const int Wymiar4 = 4;
-const int Wymiar40 = 40;
-const int Wymiar20 = 20;
+// constant values
+#define INT_8 8
+#define INT_4 4
+#define INT_40 40
+#define INT_20 20
+#define WHITE_SQUARE char(219)
+#define BLACK_SQUARE char(255)
+#define ROBOT_ICON char(167)
+#define CLS system("cls")
+#define PAUSE system("pause")
 
-//definicje dla preprocesora
+// the graph is represented by a linked list
 
-#define BialePole char(219);
-#define CzarnePole char(255);
-#define Robocik char(167);
-#define CLS system("cls");
-#define PAUSE system("pause");
-
-//struktura wierzcholka grafu, czyli jednokierunkowa lista
-
-struct Wierzcholek {
-	Wierzcholek* next;
-	int numerwierzcholka;
+struct GraphNode {
+	GraphNode* next;
+	int node_number;
 };
-void MenuGlowne();
-void DrogaRobota();
-void PiszMenu(int Numer);
-void OprawaGraficzna(int n);
-void WypiszWierzcholki(Wierzcholek**& TablicaList);
-void WypiszPlansze(int MacierzGrafu[Wymiar40][Wymiar20]);
-void WypiszPlansze(int MacierzGrafu[Wymiar40][Wymiar20]);
-void WypiszMacierz(char MacierzSegmentow[Wymiar8][Wymiar4]);
-void WypiszDroge(int Kolejnosc[Wymiar40 * Wymiar20], int koncowy);
-void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4]);
-void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int w, int k);
-void StworzMacierzPlanszy(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu[Wymiar40][Wymiar20]);
-void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited);
-void DefinicjaSegmentu(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu[Wymiar40][Wymiar20], int w, int k);
-bool DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int MacierzGrafu[Wymiar40][Wymiar20]);
-void UtworzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column);
+void main_menu();
+void robots_path();
+void display_menu(int number);
+void graphics(int n);
+void show_nodes(GraphNode**& current_graph);
+void show_graph(int graph_matrix[INT_40][INT_20]);
+void show_segments(char segment_matrix[INT_8][INT_4]);
+void show_path(int order[INT_40 * INT_20], int koncowy);
+void generate_segments(char segment_matrix[INT_8][INT_4]);
+void segment_values(int graph_matrix[INT_40][INT_20], int Segment, int w, int k);
+void generate_graph(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20]);
+void graph_init(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, bool*& visited);
+void segment_definition(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k);
+bool DFS(GraphNode**& current_graph, bool*& visited, int startowy, int koncowy, int graph_matrix[INT_40][INT_20]);
+void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char Kierunek, int row, int column);
 
 /*
-Minimum mimorum oprawy graficznej dla programu
+graphic design of the program
 */
-void OprawaGraficzna(int n)
+void graphics(int n)
 {
 	switch (n)
 	{
@@ -58,274 +54,274 @@ void OprawaGraficzna(int n)
 	}
 }
 /*
-Stworzenie planszy zlozonej z segmentow A do F
+generation of 8 x 4 matrix of segments
 */
-void GenerujMacierzSegmentow(char MacierzSegmentow[Wymiar8][Wymiar4])
+void generate_segments(char segment_matrix[INT_8][INT_4])
 {
 	for (int i = 0; i < 8; i++)
 		for (int j = 0; j < 4; j++)
-			MacierzSegmentow[i][j] = char(rand() % 6 + 65);
+			segment_matrix[i][j] = char(rand() % 6 + 65);
 }
 /*
-Wypisanie planszy segmentow
+draws the matrix of segments
 */
-void WypiszMacierz(char MacierzSegmentow[Wymiar8][Wymiar4])
+void show_segments(char segment_matrix[INT_8][INT_4])
 {
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			cout << setw(3) << MacierzSegmentow[i][j];
+			cout << setw(3) << segment_matrix[i][j];
 		}
 		cout << "\n";
 	}
 }
 /*
-Stworzenie rzeczywistej planszy, na podstawie ktorej tworzona jest lista lub wyswietlana jest droga robota
+creates the graph that will be searched
 */
-void StworzMacierzPlanszy(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu[Wymiar40][Wymiar20])
+void generate_graph(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20])
 {
-	for (int w = 0; w < Wymiar8; w++)
-		for (int k = 0; k < Wymiar4; k++)
+	for (int w = 0; w < INT_8; w++)
+		for (int k = 0; k < INT_4; k++)
 		{
-			DefinicjaSegmentu(MacierzSegmentow, MacierzGrafu, w, k);
+			segment_values(segment_matrix, graph_matrix, w, k);
 		}
 }
 /*
-Funkcja pomocnicza w tworzeniu planszy
+auxiliary function to fill the graph
 */
-void DefinicjaSegmentu(char MacierzSegmentow[Wymiar8][Wymiar4], int MacierzGrafu[Wymiar40][Wymiar20], int w, int k)
+void segment_values(char segment_matrix[INT_8][INT_4], int graph_matrix[INT_40][INT_20], int w, int k)
 {
-	int var = int((MacierzSegmentow[w][k]) - 64);
+	int var = int((segment_matrix[w][k]) - 64);
 	switch (var)
 	{
-	case 1: WypelnienieSegmentu(MacierzGrafu, 1, w, k);
+	case 1: segment_definition(graph_matrix, 1, w, k);
 		break;
-	case 2: WypelnienieSegmentu(MacierzGrafu, 2, w, k);
+	case 2: segment_definition(graph_matrix, 2, w, k);
 		break;
-	case 3: WypelnienieSegmentu(MacierzGrafu, 3, w, k);
+	case 3: segment_definition(graph_matrix, 3, w, k);
 		break;
-	case 4: WypelnienieSegmentu(MacierzGrafu, 4, w, k);
+	case 4: segment_definition(graph_matrix, 4, w, k);
 		break;
-	case 5: WypelnienieSegmentu(MacierzGrafu, 5, w, k);
+	case 5: segment_definition(graph_matrix, 5, w, k);
 		break;
-	case 6: WypelnienieSegmentu(MacierzGrafu, 6, w, k);
+	case 6: segment_definition(graph_matrix, 6, w, k);
 		break;
 	}
 }
 /*
-Recznie wpisane kombinacje segmentow planszy
+each segment consists of either black or white nodes, black nodes being not accesible by the algorithm
 */
-void WypelnienieSegmentu(int MacierzGrafu[Wymiar40][Wymiar20], int Segment, int w, int k)
+void segment_definition(int graph_matrix[INT_40][INT_20], int Segment, int w, int k)
 {
 	int r = w;
 	int c = k;
 	switch (Segment)
 	{
 	case 1: {
-		MacierzGrafu[r * 5][c * 5] = 0; MacierzGrafu[r * 5][(c * 5) + 1] = 0; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 0; MacierzGrafu[r * 5][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 0;
+		graph_matrix[r * 5][c * 5] = 0; graph_matrix[r * 5][(c * 5) + 1] = 0; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 0; graph_matrix[r * 5][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 1][c * 5] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 4][c * 5] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 0;
 		break;
 	}
 	case 2: {
-		MacierzGrafu[r * 5][c * 5] = 0; MacierzGrafu[r * 5][(c * 5) + 1] = 0; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 1; MacierzGrafu[r * 5][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 0;
+		graph_matrix[r * 5][c * 5] = 0; graph_matrix[r * 5][(c * 5) + 1] = 0; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 1; graph_matrix[r * 5][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 1][c * 5] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 4][c * 5] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 0;
 		break;
 	}
 	case 3: {
-		MacierzGrafu[r * 5][c * 5] = 1; MacierzGrafu[r * 5][(c * 5) + 1] = 1; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 1; MacierzGrafu[r * 5][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 1;
+		graph_matrix[r * 5][c * 5] = 1; graph_matrix[r * 5][(c * 5) + 1] = 1; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 1; graph_matrix[r * 5][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 1][c * 5] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 4][c * 5] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 1;
 		break;
 	}
 	case 4: {
-		MacierzGrafu[r * 5][c * 5] = 0; MacierzGrafu[r * 5][(c * 5) + 1] = 0; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 1; MacierzGrafu[r * 5][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 0;
+		graph_matrix[r * 5][c * 5] = 0; graph_matrix[r * 5][(c * 5) + 1] = 0; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 1; graph_matrix[r * 5][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 1][c * 5] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 4][c * 5] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 0;
 		break;
 	}
 	case 5: {
-		MacierzGrafu[r * 5][c * 5] = 1; MacierzGrafu[r * 5][(c * 5) + 1] = 1; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 0; MacierzGrafu[r * 5][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 0;
+		graph_matrix[r * 5][c * 5] = 1; graph_matrix[r * 5][(c * 5) + 1] = 1; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 0; graph_matrix[r * 5][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 1][c * 5] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 4][c * 5] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 0;
 		break;
 	}
 	case 6: {
-		MacierzGrafu[r * 5][c * 5] = 0; MacierzGrafu[r * 5][(c * 5) + 1] = 0; MacierzGrafu[r * 5][(c * 5) + 2] = 1; MacierzGrafu[r * 5][(c * 5) + 3] = 0; MacierzGrafu[r * 5][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 1][c * 5] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 1][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 1][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 2][c * 5] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 1] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 3] = 1; MacierzGrafu[(r * 5) + 2][(c * 5) + 4] = 1;
-		MacierzGrafu[(r * 5) + 3][c * 5] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 3][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 3][(c * 5) + 4] = 0;
-		MacierzGrafu[(r * 5) + 4][c * 5] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 1] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 2] = 1; MacierzGrafu[(r * 5) + 4][(c * 5) + 3] = 0; MacierzGrafu[(r * 5) + 4][(c * 5) + 4] = 0;
+		graph_matrix[r * 5][c * 5] = 0; graph_matrix[r * 5][(c * 5) + 1] = 0; graph_matrix[r * 5][(c * 5) + 2] = 1; graph_matrix[r * 5][(c * 5) + 3] = 0; graph_matrix[r * 5][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 1][c * 5] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 1][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 1][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 2][c * 5] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 1] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 3] = 1; graph_matrix[(r * 5) + 2][(c * 5) + 4] = 1;
+		graph_matrix[(r * 5) + 3][c * 5] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 3][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 3][(c * 5) + 4] = 0;
+		graph_matrix[(r * 5) + 4][c * 5] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 1] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 2] = 1; graph_matrix[(r * 5) + 4][(c * 5) + 3] = 0; graph_matrix[(r * 5) + 4][(c * 5) + 4] = 0;
 		break;
 	}
 	}
 }
 /*
-Stworzenie listy sasiedztw wierzcholkow, algorytm szuka w kolejnosci sasiadow dol,prawo,lewo,gora
+"links" every white node with every other white node that directly neighbors it
 */
-void InicjalizacjaListy(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, bool*& visited)
+void graph_init(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, bool*& visited)
 {
-	TablicaList = new Wierzcholek * [Wymiar40 * Wymiar20];
-	visited = new bool[Wymiar40 * Wymiar20];
-	Wierzcholek* p;
+	current_graph = new GraphNode * [INT_40 * INT_20];
+	visited = new bool[INT_40 * INT_20];
+	GraphNode* p;
 	char dol = 'D', gora = 'G', lewo = 'L', prawo = 'P';
-	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
+	for (int i = 0; i < INT_40 * INT_20; i++)
 	{
-		TablicaList[i] = NULL;
+		current_graph[i] = NULL;
 		visited[i] = false;
 	}
 
-	for (int i = 0; i < Wymiar40; i++)
-		for (int j = 0; j < Wymiar20; j++)
+	for (int i = 0; i < INT_40; i++)
+		for (int j = 0; j < INT_20; j++)
 		{
-			if (MacierzGrafu[i][j] == 0) continue;
+			if (graph_matrix[i][j] == 0) continue;
 			if (i == 0)
 			{
 				if (j == 0)
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, dol, i, j);
 				}
-				else if (j == Wymiar20 - 1)
+				else if (j == INT_20 - 1)
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, lewo, i, j);
+					create_neighbor(graph_matrix, current_graph, dol, i, j);
 				}
 				else
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, lewo, i, j);
+					create_neighbor(graph_matrix, current_graph, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, dol, i, j);
 				}
 			}
 			else if (j == 0)
 			{
-				if (i == Wymiar40 - 1)
+				if (i == INT_40 - 1)
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, gora, i, j);
+					create_neighbor(graph_matrix, current_graph, prawo, i, j);
 				}
 				else
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+					create_neighbor(graph_matrix, current_graph, gora, i, j);
+					create_neighbor(graph_matrix, current_graph, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, dol, i, j);
 				}
 			}
-			else if (i == Wymiar40 - 1)
+			else if (i == INT_40 - 1)
 			{
-				if (j == Wymiar20 - 1)
+				if (j == INT_20 - 1)
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
+					create_neighbor(graph_matrix, current_graph, gora, i, j);
+					create_neighbor(graph_matrix, current_graph, lewo, i, j);
 				}
 				else
 				{
-					UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
-					UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
+					create_neighbor(graph_matrix, current_graph, gora, i, j);
+					create_neighbor(graph_matrix, current_graph, lewo, i, j);
+					create_neighbor(graph_matrix, current_graph, prawo, i, j);
 				}
 			}
-			else if (j == Wymiar20 - 1)
+			else if (j == INT_20 - 1)
 			{
-				UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-				UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
-				UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+				create_neighbor(graph_matrix, current_graph, gora, i, j);
+				create_neighbor(graph_matrix, current_graph, lewo, i, j);
+				create_neighbor(graph_matrix, current_graph, dol, i, j);
 			}
 			else
 			{
-				UtworzSasiada(MacierzGrafu, TablicaList, gora, i, j);
-				UtworzSasiada(MacierzGrafu, TablicaList, lewo, i, j);
-				UtworzSasiada(MacierzGrafu, TablicaList, prawo, i, j);
-				UtworzSasiada(MacierzGrafu, TablicaList, dol, i, j);
+				create_neighbor(graph_matrix, current_graph, gora, i, j);
+				create_neighbor(graph_matrix, current_graph, lewo, i, j);
+				create_neighbor(graph_matrix, current_graph, prawo, i, j);
+				create_neighbor(graph_matrix, current_graph, dol, i, j);
 
 			}
 		}
 };
 
-void UtworzSasiada(int MacierzGrafu[Wymiar40][Wymiar20], Wierzcholek**& TablicaList, const char Kierunek, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
+void create_neighbor(int graph_matrix[INT_40][INT_20], GraphNode**& current_graph, const char Kierunek, int row, int column) // 68-D(1) 71-G(4) 76-L(9) 80-P(13)
 {
-	Wierzcholek* p;
+	GraphNode* p;
 	int variable = (int(Kierunek) - 67);
 	switch (variable)
 	{
 	case 1:
-		if (MacierzGrafu[row + 1][column] == 1)
+		if (graph_matrix[row + 1][column] == 1)
 		{
-			p = new Wierzcholek;
-			p->numerwierzcholka = (((row + 1) * Wymiar20) + column);
-			p->next = TablicaList[(row * Wymiar20) + column];
-			TablicaList[(row * Wymiar20) + column] = p;
+			p = new GraphNode;
+			p->node_number = (((row + 1) * INT_20) + column);
+			p->next = current_graph[(row * INT_20) + column];
+			current_graph[(row * INT_20) + column] = p;
 		}
 		break;
 	case 4:
-		if (MacierzGrafu[row - 1][column] == 1)
+		if (graph_matrix[row - 1][column] == 1)
 		{
-			p = new Wierzcholek;
-			p->numerwierzcholka = (((row - 1) * Wymiar20) + column);
-			p->next = TablicaList[(row * Wymiar20) + column];
-			TablicaList[(row * Wymiar20) + column] = p;
+			p = new GraphNode;
+			p->node_number = (((row - 1) * INT_20) + column);
+			p->next = current_graph[(row * INT_20) + column];
+			current_graph[(row * INT_20) + column] = p;
 		}
 		break;
 	case 9:
-		if (MacierzGrafu[row][column - 1] == 1)
+		if (graph_matrix[row][column - 1] == 1)
 		{
-			p = new Wierzcholek;
-			p->numerwierzcholka = ((row * Wymiar20) + column - 1);
-			p->next = TablicaList[(row * Wymiar20) + column];
-			TablicaList[(row * Wymiar20) + column] = p;
+			p = new GraphNode;
+			p->node_number = ((row * INT_20) + column - 1);
+			p->next = current_graph[(row * INT_20) + column];
+			current_graph[(row * INT_20) + column] = p;
 		}
 		break;
 	case 13:
-		if (MacierzGrafu[row][column + 1] == 1)
+		if (graph_matrix[row][column + 1] == 1)
 		{
-			p = new Wierzcholek;
-			p->numerwierzcholka = ((row * Wymiar20) + column + 1);
-			p->next = TablicaList[(row * Wymiar20) + column];
-			TablicaList[(row * Wymiar20) + column] = p;
+			p = new GraphNode;
+			p->node_number = ((row * INT_20) + column + 1);
+			p->next = current_graph[(row * INT_20) + column];
+			current_graph[(row * INT_20) + column] = p;
 		}
 		break;
 	}
 }
 /*
-Funkcja wypisuje listy sasiedztw dla kazdego wierzcholka
+outputs the neighbors of each node
 */
-void WypiszWierzcholki(Wierzcholek**& TablicaList)
+void show_nodes(GraphNode**& current_graph)
 {
-	Wierzcholek* p;
-	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
+	GraphNode* p;
+	for (int i = 0; i < INT_40 * INT_20; i++)
 	{
 		cout << "Lista [ " << i << " ] =";
-		p = TablicaList[i];
+		p = current_graph[i];
 		while (p)
 		{
-			cout << setw(5) << p->numerwierzcholka;
+			cout << setw(5) << p->node_number;
 			p = p->next;
 		}
 		cout << endl;
 	}
 }
 /*
-Zwalnia miejsce w pamieci po dynamicznie tworzonych obiektach w programie
+Deletes the graph, as it is dynamically created and new graph is generated with each presentation of the algorithm
 */
-void UsunGraf(Wierzcholek**& TablicaList, bool*& visited)
+void UsunGraf(GraphNode**& current_graph, bool*& visited)
 {
-	Wierzcholek* p, * r;
-	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
+	GraphNode* p, * r;
+	for (int i = 0; i < INT_40 * INT_20; i++)
 	{
-		p = TablicaList[i];
+		p = current_graph[i];
 		while (p)
 		{
 			r = p;
@@ -334,51 +330,51 @@ void UsunGraf(Wierzcholek**& TablicaList, bool*& visited)
 		}
 	}
 
-	delete[] TablicaList;
+	delete[] current_graph;
 	delete[] visited;
 }
 /*
-Najwazniejsza i najbardziej skomplikowana funkcja programu, algorytm przeszukiwania stworzonego grafu
+The Depth First Search recursive function, calls itself until it has found the target node
 */
-bool DFS(Wierzcholek**& TablicaList, bool*& visited, int startowy, int koncowy, int MacierzGrafu[Wymiar40][Wymiar20], int Kolejnosc[Wymiar40 * Wymiar20], static int kolejny)
+bool DFS(GraphNode**& current_graph, bool*& visited, int startowy, int koncowy, int graph_matrix[INT_40][INT_20], int order[INT_40 * INT_20], int kolejny)
 
 {
-	Wierzcholek* p;
+	GraphNode* p;
 	visited[startowy] = true;
 	if (startowy != koncowy) {
-		Kolejnosc[kolejny] = startowy;
+		order[kolejny] = startowy;
 		kolejny++;
 	}
 
 	if (startowy == koncowy)
 	{
-		Kolejnosc[kolejny] = startowy;
+		order[kolejny] = startowy;
 		cout << "Funkcja znalazla droge.\n";
 		return true;
 	}
-	for (p = TablicaList[startowy]; p; p = p->next)
+	for (p = current_graph[startowy]; p; p = p->next)
 	{
-		MacierzGrafu[startowy / 20][startowy % 20] = 2;
-		if (!visited[p->numerwierzcholka] && DFS(TablicaList, visited, p->numerwierzcholka, koncowy, MacierzGrafu, Kolejnosc, kolejny))
+		graph_matrix[startowy / 20][startowy % 20] = 2;
+		if (!visited[p->node_number] && DFS(current_graph, visited, p->node_number, koncowy, graph_matrix, order, kolejny))
 			return true;
 	}
 	return false;
 }
 /*
-Menu glowne, w nim zawiera sie caly program
+this function contains the main program loop
 */
-void MenuGlowne()
+void main_menu()
 {
 	int wybor;
 	do
 	{
-		PiszMenu(1);
+		display_menu(1);
 		cin >> wybor;
 		switch (wybor)
 		{
-		case 1: DrogaRobota();
+		case 1: robots_path();
 			break;
-		case 2:PiszMenu(2);
+		case 2:display_menu(2);
 			break;
 		case 3:exit(0);
 			break;
@@ -388,173 +384,174 @@ void MenuGlowne()
 
 }
 /*
-Funkcja wypisujaca wybrane menu
+displays selected menu
 */
-void PiszMenu(int Numer)
+void display_menu(int number)
 {
-	switch (Numer)
+	switch (number)
 	{
 	case 1:
-		CLS
-			OprawaGraficzna(1);
+		CLS;
+			graphics(1);
 		cout << setw(77) << "Wyznaczanie drogi robota przy uzyciu algorytmu typu Depth-First-Search\n"
 			<< setw(60) << " By Damian Kakol and Krzysztof Dymanowski\n\n"
-			<< "  Prosze wpisac numer opcji ktora chce sie wybrac i wcisnac enter:\n"
+			<< "  Prosze wpisac number opcji ktora chce sie wybrac i wcisnac enter:\n"
 			<< "  1. Prezentacja Algorytmu.\n"
 			<< "  2. Krotkie objasnienie dzialania programu.\n"
 			<< "  3. Wyjscie z programu.\n";
-		OprawaGraficzna(2);
-		OprawaGraficzna(3);
+		graphics(2);
+		graphics(3);
 		break;
 	case 2:
-		CLS
-			OprawaGraficzna(1);
+		CLS;
+			graphics(1);
 		cout << "  Graf, ktory tworzony jest na podstawie dwuwymiarowej tablicy i zapisany jako\n"
 			<< "  dynamiczna lista sasiedztw wierzcholkow, przy pomocy rekurencyjnego wywolania funkcji\n"
 			<< "  DFS, znajduje droge pomiedzy dwoma punktami na planszy o wymiarach 40 x 20\n"
 			<< "  od punktu A do punktu B, poruszajac sie jedynie po polach bialych\n";
-		OprawaGraficzna(2);
-		OprawaGraficzna(3);
-		PAUSE
+		graphics(2);
+		graphics(3);
+		PAUSE;
 			break;
 	case 3:
-		OprawaGraficzna(1);
-		cout << "Wybierz opcje wciskajac odpowiedni numer i klikajac enter\n"
+		graphics(1);
+		cout << "Wybierz opcje wciskajac odpowiedni number i klikajac enter\n"
 			<< "  1. Wyswietl Tablice segmentow\n"
 			<< "  2. Wyswietl Plansze przed wyznaczeniem drogi\n"
 			<< "  3. Wyswietl Liste sasiedztw wierzcholkow\n"
 			<< "  4. Wyswietl Plansze po wyznaczeniu drogi\n"
-			<< "  5. Wyswietl kolejnosc odwiedzania wierzcholkow\n"
-			<< "  6. Wyswietl numer poczatkowego i koncowego wierzcholka\n"
+			<< "  5. Wyswietl order odwiedzania wierzcholkow\n"
+			<< "  6. Wyswietl number poczatkowego i koncowego wierzcholka\n"
 			<< "  7. Wyczysc ekran\n"
 			<< "  8. Wroc do menu glownego\n";
 		break;
 	}
 }
 /*
-Wypisanie wszystkich sprawdzonych przez DFS wierzcholkow w kolejnosci "zagladania" do nich, w rzeczywistosci znajduje wierzcholek szybciej ale 
+lists every node visited in chronological order
 */
-void WypiszDroge(int Kolejnosc[Wymiar40 * Wymiar20],int koncowy)
+void show_path(int order[INT_40 * INT_20],int koncowy)
 {
 	int i;
-	for (i = 0; i < Wymiar40 * Wymiar20; i++) {
-		if (Kolejnosc[i] == 800) continue;
-		cout << Kolejnosc[i] << "->" << setw(6);
+	for (i = 0; i < INT_40 * INT_20; i++) {
+		if (order[i] == 800) continue;
+		cout << order[i] << "->" << setw(6);
 	}
-	cout << " Ostatni (odwiedzony) wierzcholek ma numer: " << koncowy << "\n";
+	cout << " Ostatni (odwiedzony) GraphNode ma number: " << koncowy << "\n";
 }
 /*
-Wypisuje plansze 40x20, w dzialaniu programu mamy dwa wywolania funkcji, jeden dla planszy przed przejsciem po grafie, drugi po przejsciu po grafie
+displays the 40 x 20 board that represents the graph, either before or after the DFS algorithm has been called
 */
-void WypiszPlansze(int MacierzGrafu[Wymiar40][Wymiar20])
+void show_graph(int graph_matrix[INT_40][INT_20])
 {
-	for (int i = 0; i < Wymiar40; i++) {
-		for (int j = 0; j < Wymiar20; j++)
+	for (int i = 0; i < INT_40; i++) {
+		for (int j = 0; j < INT_20; j++)
 		{
-			if (MacierzGrafu[i][j] == 0)
-				cout << CzarnePole
-			else if (MacierzGrafu[i][j] == 1)
-				cout << BialePole
-			else if (MacierzGrafu[i][j] == 2)
+			if (graph_matrix[i][j] == 0)
+				cout << BLACK_SQUARE;
+			else if (graph_matrix[i][j] == 1)
+				cout << WHITE_SQUARE;
+			else if (graph_matrix[i][j] == 2)
 				cout << "+";
-			else if (MacierzGrafu[i][j] == 3)
+			else if (graph_matrix[i][j] == 3)
 				cout << "A";
-			else if (MacierzGrafu[i][j] == 4)
+			else if (graph_matrix[i][j] == 4)
 				cout << "B";
-			else if (MacierzGrafu[i][j] == 5)
-				cout << Robocik
+			else if (graph_matrix[i][j] == 5)
+				cout << ROBOT_ICON;
 		}
 		cout << "\n";
 	}
 }
 /*
-Druga glowna funkcja programu, zawiera w sobie wiekszosc funkcji ktore obejmuje program
+contains the presentation part of the program
 */
-void DrogaRobota()
+void robots_path()
 {
-	int Kolejnosc[Wymiar40 * Wymiar20];
-	static int kolejny = 0;
+	int order[INT_40 * INT_20];
+	int start = 0;
+	int kolejny = start;
 	srand(time(NULL));
-	CLS
+	CLS;
 	bool* visited;
 	int R1, C1, R2, C2;
 	int opcja;
-	char Macierz[Wymiar8][Wymiar4];
-	int MacierzGrafu[Wymiar40][Wymiar20];
-	int MacierzPoWyznaczeniuDrogi[Wymiar40][Wymiar20];
-	Wierzcholek** TablicaList;
-	for (int i = 0; i < Wymiar40 * Wymiar20; i++)
-		Kolejnosc[i] = 800;
+	char Macierz[INT_8][INT_4];
+	int graph_matrix[INT_40][INT_20];
+	int MacierzPoWyznaczeniuDrogi[INT_40][INT_20];
+	GraphNode** current_graph;
+	for (int i = 0; i < INT_40 * INT_20; i++)
+		order[i] = 800;
 
-	GenerujMacierzSegmentow(Macierz);
+	generate_segments(Macierz);
 
-	StworzMacierzPlanszy(Macierz, MacierzGrafu);
-	StworzMacierzPlanszy(Macierz, MacierzPoWyznaczeniuDrogi);
+	generate_graph(Macierz, graph_matrix);
+	generate_graph(Macierz, MacierzPoWyznaczeniuDrogi);
 
-	InicjalizacjaListy(MacierzGrafu, TablicaList, visited);
-
-	do {
-		R1 = rand() % Wymiar40;
-		C1 = rand() % Wymiar20;
-	} while (MacierzGrafu[R1][C1] != 1);
+	graph_init(graph_matrix, current_graph, visited);
 
 	do {
-		R2 = rand() % Wymiar40;
-		C2 = rand() % Wymiar20;
-	} while ((MacierzGrafu[R2][C2] != 1) && (R2 != R1) && (C2 != C1));
+		R1 = rand() % INT_40;
+		C1 = rand() % INT_20;
+	} while (graph_matrix[R1][C1] != 1);
 
-	int LosowyWierzcholek = (R1 * Wymiar20) + C1;
+	do {
+		R2 = rand() % INT_40;
+		C2 = rand() % INT_20;
+	} while ((graph_matrix[R2][C2] != 1) && (R2 != R1) && (C2 != C1));
 
-	int KoncowyWierzcholek = (R2 * Wymiar20) + C2;
-	cout << LosowyWierzcholek << setw(5) << KoncowyWierzcholek << "\n";
+	int random_node = (R1 * INT_20) + C1;
 
-	bool result = DFS(TablicaList, visited, LosowyWierzcholek, KoncowyWierzcholek, MacierzPoWyznaczeniuDrogi, Kolejnosc, kolejny);
+	int current_target = (R2 * INT_20) + C2;
+	cout << random_node << setw(5) << current_target << "\n";
 
-	MacierzGrafu[R1][C1] = 5;
-	MacierzGrafu[R2][C2] = 4;
+	bool result = DFS(current_graph, visited, random_node, current_target, MacierzPoWyznaczeniuDrogi, order, kolejny);
+
+	graph_matrix[R1][C1] = 5;
+	graph_matrix[R2][C2] = 4;
 	MacierzPoWyznaczeniuDrogi[R1][C1] = 3;
 	MacierzPoWyznaczeniuDrogi[R2][C2] = 5;
 
-	CLS
+	CLS;
 
-		PiszMenu(3);
+		display_menu(3);
 
 	do {
 		cin >> opcja;
 		switch (opcja)
 		{
-		case 1: WypiszMacierz(Macierz);
-			PAUSE
+		case 1: show_segments(Macierz);
+			PAUSE;
 				break;
-		case 2:WypiszPlansze(MacierzGrafu);
-			PAUSE
+		case 2:show_graph(graph_matrix);
+			PAUSE;
 				break;
-		case 3:WypiszWierzcholki(TablicaList);
-			PAUSE
+		case 3:show_nodes(current_graph);
+			PAUSE;
 				break;
-		case 4:WypiszPlansze(MacierzPoWyznaczeniuDrogi);
-			PAUSE
+		case 4:show_graph(MacierzPoWyznaczeniuDrogi);
+			PAUSE;
 				break;
-		case 5:WypiszDroge(Kolejnosc,KoncowyWierzcholek);
-			PAUSE
+		case 5:show_path(order,current_target);
+			PAUSE;
 				break;
-		case 6: cout << " Wierzcholek poczatkowy ma numer: " << LosowyWierzcholek << " , a koncowy ma numer: " << KoncowyWierzcholek << "\n";
-			PAUSE
+		case 6: cout << " GraphNode poczatkowy ma number: " << random_node << " , a koncowy ma number: " << current_target << "\n";
+			PAUSE;
 				break;
-		case 7: CLS
-			PiszMenu(3);
+		case 7: CLS;
+			display_menu(3);
 			break;
 		case 8:
 			break;
 		}
 	} while (opcja != 8);
 
-	UsunGraf(TablicaList, visited);
-	PAUSE
+	UsunGraf(current_graph, visited);
+	PAUSE;
 }
 
 int main()
 {
-	MenuGlowne();
+	main_menu();
 	return 0;
 }
